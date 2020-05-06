@@ -1,0 +1,88 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+  labels:
+    istio-injection: enabled
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: demo-v1
+  namespace: demo
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: website
+        version: website-v1
+    spec:
+      containers:
+      - name: website-v1
+        image: popopanda/ch-k8-demo:v1
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 200
+
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: demo-v2
+  namespace: demo
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: website
+        version: website-v2
+    spec:
+      containers:
+      - name: website-v2
+        image: popopanda/ch-k8-demo:v2
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 200
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: demo-locust
+  namespace: demo
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: website
+        version: website-locust
+    spec:
+      containers:
+      - name: website-locust
+        image: popopanda/ch-k8-demo:locust
+        imagePullPolicy: Always
+      # nodeSelector:
+      #   instance_role: app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-svc
+  namespace: demo
+spec:
+  ports:
+  - port: 80
+    targetPort: 8081 #change this port if using ch-k8-demo image
+    protocol: TCP
+    name: http
+  selector:
+    app: website

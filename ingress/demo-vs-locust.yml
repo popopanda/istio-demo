@@ -1,0 +1,30 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: demo-vs
+  namespace: demo
+spec:
+  hosts:
+    - demo.mydomain.io
+  gateways:
+  - demo-ingress-gateway
+  http:
+    - route:
+      - destination:
+         host: demo-svc.demo.svc.cluster.local
+         subset: v1
+         port:
+           number: 80
+        weight: 0
+      - destination:
+         host: demo-svc.demo.svc.cluster.local
+         subset: v2
+         port:
+           number: 80
+        weight: 0
+      - destination:
+         host: demo-svc.demo.svc.cluster.local
+         subset: locust
+         port:
+           number: 80
+        weight: 100
